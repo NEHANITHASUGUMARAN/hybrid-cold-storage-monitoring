@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Intelligence - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .ai-brain {
+      font-size: 5rem;
+      color: var(--neon-purple);
+      animation: pulseBrain 2s infinite alternate;
+      text-shadow: 0 0 20px rgba(188, 19, 254, 0.5);
+      margin-bottom: 20px;
+    }
+    
+    @keyframes pulseBrain {
+      0% { transform: scale(1); filter: brightness(1); }
+      100% { transform: scale(1.05); filter: brightness(1.5); text-shadow: 0 0 40px rgba(188, 19, 254, 0.8); }
+    }
+
+    .prediction-card {
+      background: rgba(188, 19, 254, 0.05);
+      border: 1px solid rgba(188, 19, 254, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .confidence-meter {
+      height: 10px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 5px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+      width: 95%;
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">AI PREDICTIVE ENGINE</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Neural Network Analysis</span>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- AI Assistant visual -->
+      <div class="col-4 glass-panel" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <i class="fa-solid fa-brain ai-brain"></i>
+        <h3 class="text-neon-purple mb-1">ColdChain Core AI</h3>
+        <p style="color: var(--text-muted);">Status: <span class="text-neon-green">Actively Monitoring</span></p>
+        
+        <div style="width: 100%; text-align: left; margin-top: 30px;">
+          <p class="mb-1" style="font-size: 0.9rem;">Model Confidence</p>
+          <div class="confidence-meter mb-2">
+            <div class="confidence-fill"></div>
+          </div>
+          <div class="flex-between" style="font-size: 0.8rem; color: var(--text-muted);">
+            <span>Low</span>
+            <span class="text-neon-purple">95.4%</span>
+            <span>High</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spoilage & Risk -->
+      <div class="col-8 glass-panel">
+        <h3 class="mb-3"><i class="fa-solid fa-microchip text-neon-blue"></i> Live Predictions</h3>
+
+        <div class="prediction-card">
+          <div class="flex-between">
+            <h4 style="font-size: 1.2rem;"><i class="fa-solid fa-hourglass-half text-neon-yellow"></i> Estimated Safe Hours Remaining</h4>
+            <span class="badge badge-safe" id="risk-badge">SAFE</span>
+          </div>
+          <div class="data text-neon-blue" style="font-size: 3rem; margin: 10px 0;" id="safe-hours">72.5 hrs</div>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Based on current temperature stability and battery drain rate.</p>
+        </div>
+
+        <div class="prediction-card" style="border-color: rgba(255,0,60,0.2); background: rgba(255,0,60,0.05);">
+          <h4 style="font-size: 1.1rem; color: var(--neon-red);"><i class="fa-solid fa-temperature-arrow-up"></i> Thermal Breach Probability</h4>
+          <div class="progress-container mb-1" style="height: 15px;">
+            <div class="progress-bar" id="breach-prob" style="width: 12%; background: var(--neon-red);"></div>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">12% chance of exceeding 36.0°C within the next 4 hours.</p>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="col-12 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-list-check text-neon-green"></i> AI Recommendations</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 15px; border-left: 3px solid var(--neon-green); border-radius: 4px;">
+            <strong>Maintain Current Route:</strong> Telemetry shows no immediate traffic delays. ETA is optimal.
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 15px; border-left: 3px solid var(--neon-blue); border-radius: 4px;">
+            <strong>Energy Optimization:</strong> Compressor can be lowered by 5% output while maintaining safe temperature.
+          </div>
+          <div id="dynamic-rec" style="background: rgba(0,0,0,0.3); padding: 15px; border-left: 3px solid var(--neon-yellow); border-radius: 4px; display: none;">
+            <strong class="text-neon-yellow">Action Required:</strong> Temperature rising fast. Pre-emptively engage auxiliary cooling.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('ai');
+
+      let hours = 72.5;
+
+      startDataStream((data) => {
+        const riskBadge = document.getElementById('risk-badge');
+        const probBar = document.getElementById('breach-prob');
+        const dynRec = document.getElementById('dynamic-rec');
+        const safeHours = document.getElementById('safe-hours');
+
+        if (data.status === 'FAILED') {
+          riskBadge.className = 'badge badge-critical';
+          riskBadge.innerText = 'CRITICAL FAILURE';
+          probBar.style.width = '100%';
+          dynRec.style.display = 'block';
+          dynRec.innerHTML = '<strong class="text-neon-red">EMERGENCY:</strong> Integrity seal broken. Cargo compromised.';
+          dynRec.style.borderLeftColor = 'var(--neon-red)';
+          safeHours.innerText = '0.0 hrs';
+          safeHours.className = 'data text-neon-red';
+        } else if (data.aiWarning) {
+          riskBadge.className = 'badge badge-warning';
+          riskBadge.innerText = 'WARNING';
+          probBar.style.width = '65%';
+          dynRec.style.display = 'block';
+          dynRec.innerHTML = '<strong class="text-neon-yellow">Action Required:</strong> Temperature rising fast. Pre-emptively engaging auxiliary cooling.';
+          dynRec.style.borderLeftColor = 'var(--neon-yellow)';
+          
+          hours -= 0.5;
+          safeHours.innerText = hours.toFixed(1) + ' hrs';
+          safeHours.className = 'data text-neon-yellow';
+        } else {
+          riskBadge.className = 'badge badge-safe';
+          riskBadge.innerText = 'SAFE';
+          probBar.style.width = '12%';
+          dynRec.style.display = 'none';
+          safeHours.className = 'data text-neon-blue';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

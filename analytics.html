@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">DATA ANALYTICS</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Historical & Predictive Trends</span>
+      </div>
+      <div>
+        <select class="input-field" style="width: auto; padding: 8px 15px;">
+          <option>Last 24 Hours</option>
+          <option>Last 7 Days</option>
+          <option>Last 30 Days</option>
+        </select>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- Primary Temperature Chart -->
+      <div class="col-8 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-chart-area text-neon-blue"></i> Live Temperature Trend</h3>
+        <div class="chart-container">
+          <canvas id="tempChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="col-4 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-bolt text-neon-yellow"></i> Cooling Efficiency</h3>
+        
+        <div style="margin-top: 30px;">
+          <div class="flex-between mb-1">
+            <span>Compressor Usage</span>
+            <strong class="text-neon-blue">42%</strong>
+          </div>
+          <div class="progress-container mb-3">
+            <div class="progress-bar" style="width: 42%; background: var(--neon-blue);"></div>
+          </div>
+
+          <div class="flex-between mb-1">
+            <span>Battery Level</span>
+            <strong class="text-neon-green" id="battery-val">100%</strong>
+          </div>
+          <div class="progress-container mb-3">
+            <div class="progress-bar" id="battery-bar" style="width: 100%; background: var(--neon-green);"></div>
+          </div>
+
+          <div class="flex-between mb-1">
+            <span>Thermal Insulation</span>
+            <strong class="text-neon-purple">94%</strong>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 94%; background: var(--neon-purple);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Chart: Humidity -->
+      <div class="col-6 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-water" style="color: #06b6d4;"></i> Humidity Levels</h3>
+        <div class="chart-container">
+          <canvas id="humChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Secondary Chart: Risk Heatmap (Simulated via Bar Chart) -->
+      <div class="col-6 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-chart-simple text-neon-red"></i> Risk Heatmap by Zone</h3>
+        <div class="chart-container">
+          <canvas id="riskChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('analytics');
+
+      // Setup Charts
+      Chart.defaults.color = '#829ab1';
+      Chart.defaults.font.family = "'Rajdhani', sans-serif";
+
+      // Temp Chart
+      const tempCtx = document.getElementById('tempChart').getContext('2d');
+      const tempGradient = tempCtx.createLinearGradient(0, 0, 0, 300);
+      tempGradient.addColorStop(0, 'rgba(0, 243, 255, 0.5)');
+      tempGradient.addColorStop(1, 'rgba(0, 243, 255, 0.0)');
+
+      const tempChart = new Chart(tempCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Temperature (°C)',
+            data: [],
+            borderColor: '#00f3ff',
+            backgroundColor: tempGradient,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: 0, max: 15 },
+            x: { grid: { display: false } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Hum Chart
+      const humCtx = document.getElementById('humChart').getContext('2d');
+      const humChart = new Chart(humCtx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Humidity (%)',
+            data: [],
+            borderColor: '#06b6d4',
+            borderWidth: 2,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { y: { min: 30, max: 100 } }
+        }
+      });
+
+      // Risk Chart (Static for demo)
+      const riskCtx = document.getElementById('riskChart').getContext('2d');
+      new Chart(riskCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'],
+          datasets: [{
+            label: 'Risk Level',
+            data: [12, 19, 3, 5, 2],
+            backgroundColor: [
+              'rgba(0, 255, 102, 0.6)',
+              'rgba(255, 0, 60, 0.6)',
+              'rgba(0, 255, 102, 0.6)',
+              'rgba(252, 226, 5, 0.6)',
+              'rgba(0, 255, 102, 0.6)'
+            ],
+            borderColor: [
+              '#00ff66', '#ff003c', '#00ff66', '#fce205', '#00ff66'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      // Live Data Feed
+      startDataStream((data) => {
+        const time = new Date(data.timestamp).toLocaleTimeString();
+        
+        // Update Temp
+        tempChart.data.labels.push(time);
+        tempChart.data.datasets[0].data.push(data.temp);
+        if(tempChart.data.labels.length > 20) {
+          tempChart.data.labels.shift();
+          tempChart.data.datasets[0].data.shift();
+        }
+        tempChart.update('none');
+
+        // Update Hum
+        humChart.data.labels.push(time);
+        humChart.data.datasets[0].data.push(data.humidity);
+        if(humChart.data.labels.length > 20) {
+          humChart.data.labels.shift();
+          humChart.data.datasets[0].data.shift();
+        }
+        humChart.update('none');
+
+        // Battery
+        document.getElementById('battery-val').innerText = data.battery + '%';
+        document.getElementById('battery-bar').style.width = data.battery + '%';
+      });
+    });
+  </script>
+</body>
+</html>

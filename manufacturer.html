@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">GLOBAL COMMAND CENTER</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Live Network Monitoring</span>
+      </div>
+      <div style="display: flex; gap: 20px; align-items: center;">
+        <span class="badge badge-safe" id="global-status">SYSTEM OPTIMAL</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Admin" style="width: 40px; border-radius: 50%; border: 2px solid var(--neon-blue);">
+          <span>Admin Operator</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- Top Overview Cards -->
+      <div class="col-3 glass-panel value-card">
+        <div class="value-icon blue"><i class="fa-solid fa-box-open"></i></div>
+        <div class="value-info">
+          <h4>Active Shipments</h4>
+          <div class="data">24</div>
+        </div>
+      </div>
+      <div class="col-3 glass-panel value-card">
+        <div class="value-icon green"><i class="fa-solid fa-temperature-half"></i></div>
+        <div class="value-info">
+          <h4>Avg Network Temp</h4>
+          <div class="data">4.2°C</div>
+        </div>
+      </div>
+      <div class="col-3 glass-panel value-card">
+        <div class="value-icon purple"><i class="fa-solid fa-brain"></i></div>
+        <div class="value-info">
+          <h4>AI Risk Score</h4>
+          <div class="data text-neon-purple">12%</div>
+        </div>
+      </div>
+      <div class="col-3 glass-panel value-card">
+        <div class="value-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="value-info">
+          <h4>Active Alerts</h4>
+          <div class="data">1</div>
+        </div>
+      </div>
+
+      <!-- Distributor Network -->
+      <div class="col-12" style="margin-top: 20px;">
+        <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+          <i class="fa-solid fa-network-wired text-neon-blue"></i> DISTRIBUTOR NETWORK
+        </h3>
+      </div>
+
+      <!-- Distributor 1 -->
+      <div class="col-4 glass-panel">
+        <div class="flex-between mb-2">
+          <h4>Distributor 1 (North)</h4>
+          <span class="badge badge-safe">ONLINE</span>
+        </div>
+        
+        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; border-left: 3px solid var(--neon-green);">
+          <div class="flex-between">
+            <span style="font-weight: 600;">MediCorp Inc.</span>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">#RF-9921-A</span>
+          </div>
+          <div class="flex-between" style="margin-top: 10px;">
+            <span class="text-neon-green"><i class="fa-solid fa-temperature-arrow-down"></i> <span id="dist1-temp">--</span>°C</span>
+            <span><i class="fa-solid fa-droplet" style="color: #06b6d4;"></i> <span id="dist1-hum">--</span>%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 70%; background: var(--neon-green);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distributor 2 -->
+      <div class="col-4 glass-panel">
+        <div class="flex-between mb-2">
+          <h4>Distributor 2 (East)</h4>
+          <span class="badge badge-warning">DELAYED</span>
+        </div>
+        
+        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; border-left: 3px solid var(--neon-yellow);">
+          <div class="flex-between">
+            <span style="font-weight: 600;">BioLife Labs</span>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">#RF-3341-B</span>
+          </div>
+          <div class="flex-between" style="margin-top: 10px;">
+            <span class="text-neon-yellow"><i class="fa-solid fa-temperature-empty"></i> 7.5°C</span>
+            <span><i class="fa-solid fa-droplet" style="color: #06b6d4;"></i> 50.2%</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 40%; background: var(--neon-yellow);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distributor 3 -->
+      <div class="col-4 glass-panel alert-critical">
+        <div class="flex-between mb-2">
+          <h4 class="text-neon-red">Distributor 3 (South)</h4>
+          <span class="badge badge-critical">SEAL BROKEN</span>
+        </div>
+        
+        <div style="background: rgba(255,0,60,0.1); border-radius: 8px; padding: 15px; border-left: 3px solid var(--neon-red);">
+          <div class="flex-between">
+            <span style="font-weight: 600;">PharmaGlobal</span>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">#RF-1102-X</span>
+          </div>
+          <div class="flex-between" style="margin-top: 10px;">
+            <span class="text-neon-red" style="font-weight:bold; font-size: 1.2rem;"><i class="fa-solid fa-temperature-arrow-up"></i> 10.2°C</span>
+            <span class="text-neon-red"><i class="fa-solid fa-triangle-exclamation"></i> CRITICAL</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--neon-red); margin-top: 10px;">AI: Cooling failure detected. Spoilage likely.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('manufacturer');
+      
+      // Connect specifically the first distributor to the live API
+      startDataStream((data) => {
+        document.getElementById('dist1-temp').innerText = data.temp;
+        document.getElementById('dist1-hum').innerText = data.humidity;
+      });
+    });
+  </script>
+</body>
+</html>

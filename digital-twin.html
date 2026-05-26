@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Twin - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* 3D Container Simulation */
+    .scene {
+      width: 100%;
+      height: 400px;
+      perspective: 1000px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 40px 0;
+    }
+
+    .container-3d {
+      width: 400px;
+      height: 250px;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateX(-15deg) rotateY(-25deg);
+      transition: transform 1s ease;
+    }
+
+    .container-3d:hover {
+      transform: rotateX(-5deg) rotateY(-15deg);
+    }
+
+    .face {
+      position: absolute;
+      border: 2px solid var(--neon-blue);
+      background: rgba(0, 243, 255, 0.05);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.2);
+    }
+
+    .front  { width: 400px; height: 250px; transform: translateZ(100px); }
+    .back   { width: 400px; height: 250px; transform: rotateY(180deg) translateZ(100px); }
+    .right  { width: 200px; height: 250px; transform: rotateY(90deg) translateZ(300px); }
+    .left   { width: 200px; height: 250px; transform: rotateY(-90deg) translateZ(100px); border-right: none;}
+    .top    { width: 400px; height: 200px; transform: rotateX(90deg) translateZ(100px); }
+    .bottom { width: 400px; height: 200px; transform: rotateX(-90deg) translateZ(150px); box-shadow: 0 50px 100px rgba(0, 243, 255, 0.3); }
+
+    /* Internal Elements */
+    .fan {
+      font-size: 3rem;
+      color: var(--text-muted);
+      animation: spin 2s linear infinite;
+    }
+
+    .fan.active {
+      color: var(--neon-blue);
+      animation: spin 0.2s linear infinite;
+      text-shadow: 0 0 10px var(--neon-blue);
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .status-light {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--neon-green);
+      box-shadow: 0 0 15px var(--neon-green);
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .status-light.alert {
+      background: var(--neon-red);
+      box-shadow: 0 0 20px var(--neon-red);
+      animation: blink 0.5s infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Cooling particles inside container */
+    .cool-particle {
+      position: absolute;
+      width: 5px; height: 5px;
+      background: var(--neon-blue);
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    @keyframes freeze {
+      0% { transform: translateY(-50px); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(50px); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">DIGITAL TWIN SIMULATION</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Real-time 3D Container State</span>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <div class="col-12 glass-panel" style="overflow: visible;">
+        
+        <div class="flex-between">
+          <h3><i class="fa-solid fa-cube text-neon-blue"></i> Physical Asset: #RF-9921-A</h3>
+          <span class="badge badge-safe" id="twin-status">SYNCED & SAFE</span>
+        </div>
+
+        <!-- 3D Scene -->
+        <div class="scene">
+          <div class="container-3d" id="cube">
+            <div class="face front">
+              <!-- Internal view simulation -->
+              <div style="position: absolute; left: 30px; display: flex; flex-direction: column; gap: 20px;">
+                <i class="fa-solid fa-fan fan" id="fan1"></i>
+                <i class="fa-solid fa-fan fan" id="fan2"></i>
+              </div>
+              <div class="status-light" id="internal-light"></div>
+              <div style="font-size: 3rem; font-family: var(--font-display); font-weight: bold; color: rgba(255,255,255,0.8); text-shadow: 0 0 10px var(--neon-blue);" id="twin-temp">--°C</div>
+              
+              <!-- Freeze Particles -->
+              <div class="cool-particle" style="left: 40%; animation: freeze 2s infinite 0.1s;"></div>
+              <div class="cool-particle" style="left: 60%; animation: freeze 2.5s infinite 0.5s;"></div>
+              <div class="cool-particle" style="left: 80%; animation: freeze 1.8s infinite 0.3s;"></div>
+            </div>
+            <div class="face back"></div>
+            <div class="face right" style="display:flex; align-items:center; justify-content:center;">
+               <div style="transform: rotateY(-90deg); font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 5px; color: var(--neon-blue); opacity:0.5;">COLDCHAIN</div>
+            </div>
+            <div class="face left"></div>
+            <div class="face top"></div>
+            <div class="face bottom"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls & Telemetry -->
+      <div class="col-6 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-sliders text-neon-purple"></i> Cooling Subsystem</h3>
+        
+        <div class="flex-between mb-2" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+          <div>
+            <h4>Compressor State</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Auto-regulated by AI</p>
+          </div>
+          <strong id="compressor-state" class="text-neon-blue">IDLE</strong>
+        </div>
+
+        <div class="flex-between" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+          <div>
+            <h4>Fan RPM</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Internal Circulation</p>
+          </div>
+          <strong id="fan-rpm" class="text-neon-blue">800 RPM</strong>
+        </div>
+      </div>
+
+      <div class="col-6 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-microchip text-neon-green"></i> Hardware Sensors</h3>
+        
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <td>DHT11 Humidity</td>
+              <td id="twin-hum" class="text-neon-green">--%</td>
+            </tr>
+            <tr>
+              <td>DS18B20 Temp Probe 1</td>
+              <td class="text-neon-green">Normal</td>
+            </tr>
+            <tr>
+              <td>Battery Cell Array</td>
+              <td id="twin-batt" class="text-neon-green">100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('digital-twin');
+
+      const tempDisplay = document.getElementById('twin-temp');
+      const humDisplay = document.getElementById('twin-hum');
+      const battDisplay = document.getElementById('twin-batt');
+      const statusBadge = document.getElementById('twin-status');
+      const internalLight = document.getElementById('internal-light');
+      const fan1 = document.getElementById('fan1');
+      const fan2 = document.getElementById('fan2');
+      const compState = document.getElementById('compressor-state');
+      const fanRpm = document.getElementById('fan-rpm');
+      const cube = document.getElementById('cube');
+
+      startDataStream((data) => {
+        tempDisplay.innerText = data.temp + '°C';
+        humDisplay.innerText = data.humidity + '%';
+        battDisplay.innerText = data.battery + '%';
+
+        if(data.status === 'FAILED') {
+          statusBadge.className = 'badge badge-critical';
+          statusBadge.innerText = 'SEAL BROKEN - CRITICAL';
+          internalLight.className = 'status-light alert';
+          cube.style.borderColor = 'var(--neon-red)';
+          // Force fans max
+          fan1.classList.add('active');
+          fan2.classList.add('active');
+          compState.innerText = 'OVERDRIVE';
+          compState.className = 'text-neon-red';
+          fanRpm.innerText = '3200 RPM';
+          fanRpm.className = 'text-neon-red';
+          tempDisplay.style.color = 'var(--neon-red)';
+          tempDisplay.style.textShadow = '0 0 10px var(--neon-red)';
+        } else if (data.cooling) {
+          fan1.classList.add('active');
+          fan2.classList.add('active');
+          compState.innerText = 'ACTIVE (COOLING)';
+          fanRpm.innerText = '2400 RPM';
+        } else {
+          fan1.classList.remove('active');
+          fan2.classList.remove('active');
+          compState.innerText = 'IDLE';
+          compState.className = 'text-neon-blue';
+          fanRpm.innerText = '800 RPM';
+          fanRpm.className = 'text-neon-blue';
+          internalLight.className = 'status-light';
+          tempDisplay.style.color = 'rgba(255,255,255,0.8)';
+          tempDisplay.style.textShadow = '0 0 10px var(--neon-blue)';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

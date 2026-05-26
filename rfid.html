@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFID Authentication - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .scanner-box {
+      width: 100%;
+      height: 300px;
+      border: 2px dashed var(--glass-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .scanner-box:hover {
+      border-color: var(--neon-blue);
+      background: rgba(0,243,255,0.02);
+    }
+
+    .scanner-line {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--neon-blue);
+      box-shadow: 0 0 15px var(--neon-blue);
+      animation: scan 2s linear infinite;
+      display: none;
+    }
+
+    @keyframes scan {
+      0% { top: 0; }
+      50% { top: 100%; }
+      100% { top: 0; }
+    }
+
+    .rfid-icon {
+      font-size: 5rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      transition: color 0.3s ease;
+    }
+
+    .scanner-box.scanning .scanner-line { display: block; }
+    .scanner-box.scanning .rfid-icon { color: var(--neon-blue); animation: pulse 1s infinite alternate; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); text-shadow: 0 0 0 var(--neon-blue); }
+      100% { transform: scale(1.1); text-shadow: 0 0 20px var(--neon-blue); }
+    }
+
+    .auth-result {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">RFID SCANNER SYSTEM</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Hardware Authentication Gateway</span>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- Scanner Simulation -->
+      <div class="col-6 glass-panel">
+        <h3 class="mb-3"><i class="fa-solid fa-barcode text-neon-blue"></i> Scan Container Tag</h3>
+        
+        <div class="scanner-box" id="scanner-box" onclick="simulateScan()">
+          <div class="scanner-line"></div>
+          <i class="fa-brands fa-nfc-symbol rfid-icon"></i>
+          <p style="color: var(--text-muted); font-size: 1.2rem;">Click to simulate RFID / NFC Scan</p>
+        </div>
+
+        <div class="input-group" style="margin-top: 30px;">
+          <label>Manual Override Code</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" class="input-field" placeholder="Enter TAG ID (e.g. RF-9921-A)">
+            <button class="btn btn-neon">Verify</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Authentication Results -->
+      <div class="col-6 glass-panel">
+        <h3 class="mb-3"><i class="fa-solid fa-clipboard-check text-neon-green"></i> Verification Protocol</h3>
+
+        <div id="default-state" style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+          Waiting for scan input...
+        </div>
+
+        <div class="auth-result" id="auth-result">
+          <div class="flex-between mb-3" style="border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;">
+            <h2 class="text-neon-green">TAG VERIFIED</h2>
+            <i class="fa-solid fa-circle-check text-neon-green" style="font-size: 2rem;"></i>
+          </div>
+
+          <table class="data-table" style="margin-bottom: 20px;">
+            <tbody>
+              <tr>
+                <td>Tag ID</td>
+                <td style="color: #fff; font-family: var(--font-display);">#RF-9921-A</td>
+              </tr>
+              <tr>
+                <td>Assigned Buyer</td>
+                <td>MediCorp Inc.</td>
+              </tr>
+              <tr>
+                <td>Product Type</td>
+                <td>Vaccine Batch V-X90</td>
+              </tr>
+              <tr>
+                <td>Blockchain Hash</td>
+                <td style="font-size: 0.8rem; color: var(--text-muted);">0x9a4f...3c21</td>
+              </tr>
+              <tr>
+                <td>Integrity Seal</td>
+                <td><span class="badge badge-safe">INTACT</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <button class="btn btn-neon" style="width: 100%;"><i class="fa-solid fa-unlock-keyhole"></i> AUTHORIZE UNLOCK</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('rfid');
+    });
+
+    function simulateScan() {
+      const scanner = document.getElementById('scanner-box');
+      const defaultState = document.getElementById('default-state');
+      const authResult = document.getElementById('auth-result');
+
+      scanner.classList.add('scanning');
+      defaultState.style.display = 'none';
+      authResult.style.display = 'none';
+
+      // Simulate a 2-second scan delay
+      setTimeout(() => {
+        scanner.classList.remove('scanning');
+        authResult.style.display = 'block';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

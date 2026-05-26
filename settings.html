@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .toggle-switch.active { background: var(--neon-blue); }
+    .toggle-switch.active::after {
+      transform: translateX(26px);
+      box-shadow: 0 0 10px #fff;
+    }
+
+    .settings-section {
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 20px;
+    }
+    .settings-section:last-child { border-bottom: none; }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">SYSTEM CONFIGURATION</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Global Preferences & AI Tuning</span>
+      </div>
+      <div>
+        <button class="btn btn-neon" onclick="saveSettings()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- Core Settings -->
+      <div class="col-8 glass-panel">
+        
+        <div class="settings-section">
+          <h3 class="mb-3 text-neon-blue"><i class="fa-solid fa-temperature-empty"></i> Thermal Thresholds</h3>
+          <div class="grid-container" style="padding: 0; gap: 20px;">
+            <div class="col-6 input-group mb-0">
+              <label>Minimum Safe Temperature (°C)</label>
+              <input type="number" class="input-field" value="2.0" step="0.1">
+            </div>
+            <div class="col-6 input-group mb-0">
+              <label>Maximum Safe Temperature (°C)</label>
+              <input type="number" class="input-field" value="36.0" step="0.1">
+            </div>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 10px;">Breaching these limits will permanently break the Integrity Seal.</p>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="mb-3 text-neon-purple"><i class="fa-solid fa-brain"></i> AI Sensitivity Tuning</h3>
+          <div class="input-group">
+            <label>Rate of Change Threshold (°C / cycle)</label>
+            <input type="range" class="input-field" min="0.1" max="5.0" step="0.1" value="1.5" style="padding: 0; height: 5px; cursor: pointer;">
+            <div class="flex-between" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">
+              <span>Hyper-Sensitive (0.1)</span>
+              <span>Current: 1.5°C</span>
+              <span>Relaxed (5.0)</span>
+            </div>
+          </div>
+          <div class="flex-between" style="margin-top: 20px;">
+            <div>
+              <h4>Auto-Engage Auxiliary Cooling</h4>
+              <p style="color: var(--text-muted); font-size: 0.85rem;">Allow AI to override manual controls during critical events.</p>
+            </div>
+            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3 class="mb-3 text-neon-green"><i class="fa-solid fa-bell"></i> Notification Rules</h3>
+          
+          <div class="flex-between mb-2">
+            <span>Email Alerts for Warnings</span>
+            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+          </div>
+          <div class="flex-between mb-2">
+            <span>SMS Alerts for Seal Breaches (Critical)</span>
+            <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+          </div>
+          <div class="flex-between">
+            <span>Weekly PDF Summary Reports</span>
+            <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Profile & Theme -->
+      <div class="col-4 glass-panel">
+        <h3 class="mb-3"><i class="fa-solid fa-user-shield text-neon-blue"></i> Operator Profile</h3>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff&size=100" alt="Admin" style="border-radius: 50%; border: 3px solid var(--neon-blue); box-shadow: 0 0 15px rgba(0,243,255,0.3);">
+          <h4 style="margin-top: 10px;">System Administrator</h4>
+          <span class="badge badge-safe" style="font-size: 0.7rem;">Clearance Level: OMEGA</span>
+        </div>
+
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" class="input-field" value="admin@coldchain.iot" disabled style="opacity: 0.7;">
+        </div>
+        
+        <div class="input-group">
+          <label>Change Access Code</label>
+          <input type="password" class="input-field" placeholder="••••••••">
+        </div>
+
+        <h3 class="mb-3 mt-3" style="margin-top: 30px;"><i class="fa-solid fa-palette text-neon-purple"></i> Interface Theme</h3>
+        <select class="input-field">
+          <option>Dark Futuristic (Neon Blue)</option>
+          <option>High Contrast Industrial</option>
+          <option>Terminal Green</option>
+        </select>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('settings');
+    });
+
+    function saveSettings() {
+      const btn = document.querySelector('.btn-neon');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved Successfully';
+        btn.classList.add('badge-safe');
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+          btn.classList.remove('badge-safe');
+        }, 2000);
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

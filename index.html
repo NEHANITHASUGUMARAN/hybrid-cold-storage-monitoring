@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColdChain AI - Smart IoT Platform</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Specific Landing Page Styles */
+    .landing-nav {
+      position: fixed;
+      top: 0; width: 100%;
+      background: rgba(5, 8, 15, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 100px 20px 50px;
+      position: relative;
+    }
+
+    .hero-title {
+      font-size: 4.5rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      line-height: 1.1;
+      text-transform: uppercase;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin-bottom: 50px;
+    }
+
+    .particles {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      background: var(--neon-blue);
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: rise linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); text-shadow: 0 0 20px rgba(0,243,255,0.3); }
+      50% { transform: translateY(-10px); text-shadow: 0 0 40px rgba(0,243,255,0.6); }
+      100% { transform: translateY(0px); text-shadow: 0 0 20px rgba(0,243,255,0.3); }
+    }
+
+    @keyframes rise {
+      0% { bottom: -10px; transform: translateX(0); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { bottom: 100%; transform: translateX(-20px); opacity: 0; }
+    }
+    
+    .tech-stack {
+      display: flex;
+      gap: 30px;
+      margin-top: 60px;
+      justify-content: center;
+      opacity: 0.6;
+    }
+    .tech-stack i { font-size: 2.5rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="landing-nav">
+    <div class="brand" style="margin:0; padding:0; border:none;">
+      <i class="fa-solid fa-snowflake text-neon-blue"></i>
+      <span>ColdChain AI</span>
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <a href="#about" class="btn">About</a>
+      <a href="#features" class="btn">Features</a>
+      <a href="login.html" class="btn btn-neon"><i class="fa-solid fa-right-to-bracket"></i> Login / Portal</a>
+    </div>
+  </nav>
+
+  <div class="particles" id="particles"></div>
+
+  <section class="hero-section">
+    <div class="glass-panel" style="padding: 10px 20px; border-radius: 30px; margin-bottom: 30px; border-color: var(--neon-purple);">
+      <span class="text-gradient" style="font-weight: bold; letter-spacing: 2px;">V2.0 DIGITAL TWIN PLATFORM LIVE</span>
+    </div>
+    
+    <h1 class="hero-title">Hybrid <span class="text-neon-blue">AI-Enabled</span><br>IoT Monitoring</h1>
+    <p class="hero-subtitle">Predictive analytics and absolute temperature integrity sealing for industry-level smart logistics.</p>
+    
+    <div style="display: flex; gap: 20px;">
+      <a href="login.html" class="btn btn-neon" style="padding: 15px 40px; font-size: 1.2rem;">
+        START MONITORING <i class="fa-solid fa-satellite-dish"></i>
+      </a>
+      <a href="manufacturer.html" class="btn btn-purple" style="padding: 15px 40px; font-size: 1.2rem;">
+        LIVE DEMO <i class="fa-solid fa-play"></i>
+      </a>
+    </div>
+
+    <div class="tech-stack">
+      <i class="fa-brands fa-html5" title="HTML5"></i>
+      <i class="fa-brands fa-css3-alt" title="CSS3"></i>
+      <i class="fa-brands fa-js" title="JavaScript"></i>
+      <i class="fa-solid fa-chart-pie" title="Chart.js"></i>
+      <i class="fa-solid fa-map-location-dot" title="Leaflet.js"></i>
+    </div>
+  </section>
+
+  <section id="features" class="grid-container" style="padding: 100px 50px;">
+    <div class="col-12" style="text-align: center; margin-bottom: 50px;">
+      <h2 style="font-size: 2.5rem;"><span class="text-neon-blue">Smart Logistics</span> Architecture</h2>
+    </div>
+    
+    <div class="col-4 glass-panel" style="text-align: center;">
+      <i class="fa-solid fa-brain text-neon-purple" style="font-size: 3rem; margin-bottom: 20px;"></i>
+      <h3>AI Predictive Alerts</h3>
+      <p style="color: var(--text-muted); margin-top: 15px;">Simulate spoilage risks and predict temperature fluctuations before failure occurs.</p>
+    </div>
+    
+    <div class="col-4 glass-panel" style="text-align: center;">
+      <i class="fa-solid fa-shield-halved text-neon-green" style="font-size: 3rem; margin-bottom: 20px;"></i>
+      <h3>Integrity Seal</h3>
+      <p style="color: var(--text-muted); margin-top: 15px;">Immutable state logging. If safe thresholds are crossed, the seal breaks permanently.</p>
+    </div>
+
+    <div class="col-4 glass-panel" style="text-align: center;">
+      <i class="fa-solid fa-cube text-neon-blue" style="font-size: 3rem; margin-bottom: 20px;"></i>
+      <h3>Digital Twin VR</h3>
+      <p style="color: var(--text-muted); margin-top: 15px;">Real-time 3D representation of container states, cooling systems, and fan RPMs.</p>
+    </div>
+  </section>
+
+  <script>
+    // Particle Generator
+    const container = document.getElementById('particles');
+    for(let i=0; i<50; i++) {
+      let particle = document.createElement('div');
+      particle.className = 'particle';
+      
+      let size = Math.random() * 5 + 2;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
+      
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+      particle.style.animationDelay = (Math.random() * 5) + 's';
+      
+      container.appendChild(particle);
+    }
+  </script>
+</body>
+</html>

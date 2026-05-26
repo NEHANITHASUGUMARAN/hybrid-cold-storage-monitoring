@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Portal - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">BUYER PORTAL</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Tracking Shipment <span class="text-neon-blue">#RF-9921-A</span></span>
+      </div>
+      <div style="display: flex; gap: 15px;">
+        <a href="reports.html" class="btn btn-purple" style="padding: 8px 16px; font-size: 0.9rem;">
+          <i class="fa-solid fa-file-pdf"></i> Get PDF Report
+        </a>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- Live Status Banner -->
+      <div class="col-12 glass-panel" id="integrity-banner" style="display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--neon-green);">
+        <div style="display: flex; gap: 20px; align-items: center;">
+          <i class="fa-solid fa-shield-check text-neon-green" id="integrity-icon" style="font-size: 2.5rem;"></i>
+          <div>
+            <h3 id="integrity-title" class="text-neon-green">INTEGRITY SEAL: SAFE</h3>
+            <p style="color: var(--text-muted);">Temperature limits have not been breached.</p>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <h4>Product: <span style="color:#fff;">Vaccine Batch V-X90</span></h4>
+          <p style="color: var(--text-muted); font-size:0.9rem;">Est. Delivery: 2 Hours</p>
+        </div>
+      </div>
+
+      <!-- AI Warning Banner (Hidden by default) -->
+      <div class="col-12 glass-panel alert-critical" id="ai-banner" style="display: none; background: rgba(255,0,60,0.1);">
+        <h3 class="text-neon-red"><i class="fa-solid fa-brain"></i> AI WARNING: RAPID TEMPERATURE RISE DETECTED</h3>
+        <p style="margin-top: 5px;">Cooling system auto-engaged. Predicting potential spoilage if rate of change is not stabilized.</p>
+      </div>
+
+      <!-- Live Stats -->
+      <div class="col-4 glass-panel value-card" style="flex-direction: column; align-items: flex-start;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+          <div class="value-icon blue"><i class="fa-solid fa-temperature-half"></i></div>
+          <div class="value-info">
+            <h4>Live Temperature</h4>
+            <div class="data text-neon-blue"><span id="live-temp">--</span>°C</div>
+          </div>
+        </div>
+        <div class="progress-container">
+          <div id="temp-bar" class="progress-bar" style="width: 50%; background: var(--neon-blue);"></div>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Safe Range: 2.0°C - 36.0°C</p>
+      </div>
+
+      <div class="col-4 glass-panel value-card" style="flex-direction: column; align-items: flex-start;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+          <div class="value-icon" style="color: #06b6d4; border-color: rgba(6,182,212,0.3);"><i class="fa-solid fa-droplet"></i></div>
+          <div class="value-info">
+            <h4>Live Humidity</h4>
+            <div class="data" style="color:#06b6d4;"><span id="live-hum">--</span>%</div>
+          </div>
+        </div>
+        <div class="progress-container">
+          <div id="hum-bar" class="progress-bar" style="width: 50%; background: #06b6d4;"></div>
+        </div>
+      </div>
+
+      <div class="col-4 glass-panel value-card" style="flex-direction: column; align-items: flex-start;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+          <div class="value-icon purple"><i class="fa-solid fa-leaf"></i></div>
+          <div class="value-info">
+            <h4>AI Freshness Score</h4>
+            <div class="data text-neon-purple"><span id="fresh-score">99</span>/100</div>
+          </div>
+        </div>
+        <div class="progress-container">
+          <div id="fresh-bar" class="progress-bar" style="width: 99%; background: var(--neon-purple);"></div>
+        </div>
+      </div>
+
+      <!-- Quick Navs to deeper pages -->
+      <div class="col-6 glass-panel" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px;">
+        <i class="fa-solid fa-route text-neon-blue" style="font-size: 3rem; margin-bottom: 15px;"></i>
+        <h3 style="margin-bottom: 15px;">Shipment Timeline</h3>
+        <a href="shipment.html" class="btn btn-neon">View Full Timeline <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      <div class="col-6 glass-panel" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 200px;">
+        <i class="fa-solid fa-map-location-dot text-neon-green" style="font-size: 3rem; margin-bottom: 15px;"></i>
+        <h3 style="margin-bottom: 15px;">Live GPS Tracking</h3>
+        <a href="map.html" class="btn btn-neon" style="color: var(--neon-green); border-color: var(--neon-green);">Open Live Map <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('buyer');
+
+      const integrityBanner = document.getElementById('integrity-banner');
+      const integrityTitle = document.getElementById('integrity-title');
+      const integrityIcon = document.getElementById('integrity-icon');
+      const aiBanner = document.getElementById('ai-banner');
+      let freshness = 99;
+
+      startDataStream((data) => {
+        document.getElementById('live-temp').innerText = data.temp;
+        document.getElementById('live-hum').innerText = data.humidity;
+        
+        // Progress bars
+        let tempPct = ((data.temp - 0) / 10) * 100; 
+        document.getElementById('temp-bar').style.width = Math.min(Math.max(tempPct, 0), 100) + '%';
+        document.getElementById('hum-bar').style.width = data.humidity + '%';
+
+        // Update Integrity Seal
+        if (data.status === 'FAILED') {
+          integrityBanner.style.borderColor = 'var(--neon-red)';
+          integrityBanner.classList.add('alert-critical');
+          integrityTitle.innerText = 'INTEGRITY SEAL: BROKEN';
+          integrityTitle.className = 'text-neon-red';
+          integrityIcon.className = 'fa-solid fa-shield-virus text-neon-red';
+        }
+
+        // Update AI Warning
+        if (data.aiWarning && data.status !== 'FAILED') {
+          aiBanner.style.display = 'block';
+          freshness -= 0.5; // Simulate freshness dropping fast if warning
+        } else {
+          aiBanner.style.display = 'none';
+        }
+
+        // Simulate normal freshness drop over time
+        freshness = Math.max(0, freshness - 0.05);
+        document.getElementById('fresh-score').innerText = Math.round(freshness);
+        document.getElementById('fresh-bar').style.width = freshness + '%';
+      });
+    });
+  </script>
+</body>
+</html>

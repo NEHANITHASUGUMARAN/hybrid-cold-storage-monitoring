@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipment Details - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Timeline specific styles */
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+      margin-top: 20px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--glass-border);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -29px;
+      top: 5px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--neon-blue);
+      box-shadow: 0 0 10px var(--neon-blue);
+      z-index: 1;
+    }
+    .timeline-item.success::before { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+    .timeline-item.warning::before { background: var(--neon-yellow); box-shadow: 0 0 10px var(--neon-yellow); }
+    .timeline-item.danger::before { background: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
+    
+    .timeline-content {
+      background: rgba(0,0,0,0.3);
+      padding: 15px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+    }
+    .timeline-time {
+      font-family: var(--font-display);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">SHIPMENT INTELLIGENCE</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Container <span class="text-neon-blue">#RF-9921-A</span> Details</span>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      
+      <!-- Driver & Transport Info -->
+      <div class="col-4 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-truck text-neon-blue"></i> Transport Manifest</h3>
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+          <img src="https://ui-avatars.com/api/?name=John+Doe&background=random" alt="Driver" style="border-radius: 50%; width: 50px;">
+          <div>
+            <h4>John Doe</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Lead Driver (ID: D-401)</p>
+          </div>
+        </div>
+        <p class="mb-1"><strong style="color: var(--text-muted);">Vehicle:</strong> Freightliner Cascadia</p>
+        <p class="mb-1"><strong style="color: var(--text-muted);">Plate:</strong> NY-12345</p>
+        <p class="mb-1"><strong style="color: var(--text-muted);">Route:</strong> Facility A -> Hub B</p>
+        <p><strong style="color: var(--text-muted);">Cooling Unit:</strong> ThermoKing SmartX</p>
+      </div>
+
+      <!-- Live Log Box -->
+      <div class="col-8 glass-panel">
+        <h3 class="mb-2"><i class="fa-solid fa-clipboard-list text-neon-purple"></i> Event Timeline & Logs</h3>
+        
+        <div class="timeline">
+          <div class="timeline-item success">
+            <div class="timeline-time">Today, 08:00 AM</div>
+            <div class="timeline-content">
+              <h4><i class="fa-solid fa-box"></i> Cargo Loaded</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Vaccine batch V-X90 loaded into container #RF-9921-A. Pre-cooling to 4.0°C successful.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item success">
+            <div class="timeline-time">Today, 08:30 AM</div>
+            <div class="timeline-content">
+              <h4><i class="fa-solid fa-shield-check"></i> Integrity Seal Activated</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Digital twin initialized. Blockchain integrity hash generated and locked.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item warning">
+            <div class="timeline-time">Today, 10:15 AM</div>
+            <div class="timeline-content" style="border-color: rgba(252,226,5,0.3);">
+              <h4 class="text-neon-yellow"><i class="fa-solid fa-triangle-exclamation"></i> AI Warning: Traffic Delay</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Unexpected traffic on Route 9. ETA extended by 45 minutes. Cooling system adjusted to conserve battery.</p>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-time">LIVE</div>
+            <div class="timeline-content" style="border-color: var(--neon-blue); box-shadow: inset 0 0 10px rgba(0,243,255,0.1);">
+              <h4 class="text-neon-blue"><i class="fa-solid fa-satellite-dish"></i> Telemetry Stream Active</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;" id="live-log-text">Receiving data...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('shipment');
+      const logText = document.getElementById('live-log-text');
+      
+      startDataStream((data) => {
+        logText.innerHTML = `
+          Current Temp: <strong class="text-neon-blue">${data.temp}°C</strong> | 
+          Humidity: <strong>${data.humidity}%</strong> | 
+          Status: <strong>${data.status}</strong>
+        `;
+      });
+    });
+  </script>
+</body>
+</html>

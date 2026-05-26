@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .login-container {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .role-cards {
+      display: flex;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .role-card {
+      width: 250px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .role-card:hover {
+      border-color: var(--neon-blue);
+      transform: translateY(-10px);
+    }
+
+    .role-card.active {
+      border-color: var(--neon-blue);
+      box-shadow: inset 0 0 20px rgba(0,243,255,0.2), 0 0 20px rgba(0,243,255,0.2);
+    }
+
+    .role-card i {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    .role-card:hover i { transform: scale(1.1); }
+
+    .login-form {
+      display: none;
+      animation: fadeIn 0.5s ease;
+      margin-top: 30px;
+    }
+    .login-form.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  
+  <a href="index.html" class="brand" style="position: absolute; top: 30px; left: 30px; border:none;">
+    <i class="fa-solid fa-snowflake text-neon-blue"></i> ColdChain AI
+  </a>
+
+  <div class="login-container">
+    <div class="glass-panel" style="max-width: 600px; width: 100%; text-align: center;">
+      <h2>System Authorization</h2>
+      <p style="color: var(--text-muted); margin-top: 10px;">Select your security clearance level</p>
+
+      <div class="role-cards" id="roleSelection">
+        <div class="glass-panel role-card" onclick="selectRole('manufacturer')">
+          <i class="fa-solid fa-industry text-neon-blue"></i>
+          <h3>Manufacturer</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">Admin Override & Full Network View</p>
+        </div>
+        
+        <div class="glass-panel role-card" onclick="selectRole('buyer')">
+          <i class="fa-solid fa-box-open text-neon-purple"></i>
+          <h3>Buyer</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">Specific Shipment Tracking</p>
+        </div>
+      </div>
+
+      <div class="login-form" id="loginForm">
+        <h3 id="formTitle" style="margin-bottom: 20px; color: var(--neon-blue);"></h3>
+        <div class="input-group">
+          <input type="text" class="input-field" placeholder="Terminal ID / Email" value="admin@coldchain.iot">
+        </div>
+        <div class="input-group">
+          <input type="password" class="input-field" placeholder="Access Code" value="••••••••">
+        </div>
+        <button onclick="executeLogin()" class="btn btn-neon" style="width: 100%; padding: 15px;">
+          <i class="fa-solid fa-fingerprint"></i> INITIATE LOGIN
+        </button>
+        <button onclick="resetSelection()" class="btn" style="margin-top: 15px; color: var(--text-muted);">
+          <i class="fa-solid fa-arrow-left"></i> Change Role
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let selectedRole = '';
+
+    function selectRole(role) {
+      selectedRole = role;
+      document.getElementById('roleSelection').style.display = 'none';
+      const form = document.getElementById('loginForm');
+      form.classList.add('active');
+      
+      const title = document.getElementById('formTitle');
+      if(role === 'manufacturer') {
+        title.innerText = 'Admin Authentication';
+        title.className = 'text-neon-blue';
+      } else {
+        title.innerText = 'Buyer Portal Access';
+        title.className = 'text-neon-purple';
+      }
+    }
+
+    function resetSelection() {
+      document.getElementById('roleSelection').style.display = 'flex';
+      document.getElementById('loginForm').classList.remove('active');
+    }
+
+    function executeLogin() {
+      if(selectedRole === 'manufacturer') {
+        window.location.href = 'manufacturer.html';
+      } else {
+        window.location.href = 'buyer.html';
+      }
+    }
+  </script>
+</body>
+</html>

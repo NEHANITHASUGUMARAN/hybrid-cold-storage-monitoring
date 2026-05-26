@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live GPS Tracking - ColdChain AI</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    #map-container {
+      height: 70vh;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Custom Map Overlays to match dark theme */
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      background: rgba(10, 15, 30, 0.9) !important;
+      color: #fff !important;
+      border: 1px solid var(--neon-blue);
+      backdrop-filter: blur(10px);
+    }
+    .leaflet-container {
+      background: var(--bg-base);
+    }
+    
+    .map-stats {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(5, 8, 15, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      padding: 20px;
+      border-radius: 12px;
+      width: 250px;
+    }
+
+    /* Radar Animation */
+    .radar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 150vw;
+      height: 150vw;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 500;
+      background: conic-gradient(from 0deg, transparent 70%, rgba(0, 243, 255, 0.15) 100%);
+      border-radius: 50%;
+      animation: scan-radar 4s linear infinite;
+    }
+
+    @keyframes scan-radar {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Pulsing Truck Icon */
+    .truck-pulse {
+      position: relative;
+      background-color: var(--neon-blue); 
+      width: 15px; 
+      height: 15px; 
+      border-radius: 50%; 
+      border: 2px solid #fff;
+      box-shadow: 0 0 15px var(--neon-blue);
+    }
+    .truck-pulse::after {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      border: 2px solid var(--neon-blue);
+      border-radius: 50%;
+      animation: radar-pulse 1.5s ease-out infinite;
+    }
+
+    @keyframes radar-pulse {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    
+    .hub-marker {
+      background: var(--neon-purple);
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 20px var(--neon-purple);
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+  </style>
+</head>
+<body class="dashboard-layout">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <nav class="top-nav">
+      <div>
+        <h2 class="text-gradient">LIVE TELEMETRY MAP</h2>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Global Network Tracking</span>
+      </div>
+    </nav>
+
+    <div class="grid-container">
+      <div class="col-12 glass-panel" style="padding: 10px;">
+        <div id="map-container">
+          <div class="radar"></div>
+          
+          <div class="map-stats">
+            <h4 class="text-neon-blue mb-2"><i class="fa-solid fa-satellite"></i> GPS Active</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">LAT: <span id="lat-val" style="color: #fff;">--</span></p>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">LNG: <span id="lng-val" style="color: #fff;">--</span></p>
+            
+            <hr style="border:none; border-top: 1px solid var(--glass-border); margin-bottom: 15px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Speed</span>
+              <strong style="color: var(--neon-green);">65 MPH</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">Distance to Hub</span>
+              <strong>142 Miles</strong>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="scripts/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar('map');
+
+      // Initialize Leaflet Map (Dark Theme)
+      const map = L.map('map-container').setView([12.8690, 80.2150], 14);
+      
+      // Use CartoDB Dark Matter tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20
+      }).addTo(map);
+
+      // Custom Neon Icon with Pulse
+      const truckIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div class='truck-pulse'></div>",
+        iconSize: [15, 15],
+        iconAnchor: [7, 7]
+      });
+
+      const marker = L.marker([12.8690, 80.2150], {icon: truckIcon}).addTo(map);
+      marker.bindPopup("<b>Container #RF-9921-A</b><br>Live Telemetry Link Active");
+
+      // Destination / Hub Marker
+      const hubIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div class='hub-marker'><i class='fa-solid fa-building' style='font-size: 12px;'></i></div>",
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      L.marker([12.8690, 80.2150], {icon: hubIcon}).addTo(map).bindPopup("<b>St. Joseph's Hub</b>");
+
+      // Draw a Geo-Fence (Safe Zone radius)
+      const geoFence = L.circle([12.8690, 80.2150], {
+        color: 'var(--neon-purple)',
+        fillColor: 'var(--neon-purple)',
+        fillOpacity: 0.05,
+        radius: 1000 // meters
+      }).addTo(map);
+
+      // Route Trail
+      const routeTrail = L.polyline([], {
+        color: 'var(--neon-blue)',
+        weight: 3,
+        opacity: 0.6,
+        dashArray: '5, 10',
+        lineCap: 'round'
+      }).addTo(map);
+
+      // Listen to API and move marker
+      startDataStream((data) => {
+        const newLatLng = [data.lat, data.lng];
+        marker.setLatLng(newLatLng);
+        
+        // Add to trail
+        routeTrail.addLatLng(newLatLng);
+
+        map.panTo(newLatLng);
+
+        document.getElementById('lat-val').innerText = data.lat.toFixed(6);
+        document.getElementById('lng-val').innerText = data.lng.toFixed(6);
+      });
+    });
+  </script>
+</body>
+</html>
