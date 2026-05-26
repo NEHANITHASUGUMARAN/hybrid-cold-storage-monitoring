@@ -1,0 +1,303 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <DHT.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// =====================================================
+// WIFI SETTINGS
+// =====================================================
+
+const char* ssid = "userid";
+const char* password = "Password@123";
+
+// =====================================================
+// THINGSPEAK SETTINGS
+// =====================================================
+
+String apiKey = "3DJYLD010*********";
+const char* server = "http://api.thingspeak.com/update";
+
+// =====================================================
+// DHT11 SETTINGS
+// =====================================================
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+// =====================================================
+// DS18B20 SETTINGS
+// =====================================================
+
+#define ONE_WIRE_BUS 5
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+// =====================================================
+// OUTPUT PINS
+// =====================================================
+
+#define GREEN_LED 12
+#define RED_LED 13
+#define BUZZER 14
+#define RELAY_PIN 27
+
+// =====================================================
+// RELAY LOGIC
+// ACTIVE LOW RELAY MODULE
+// =====================================================
+
+#define RELAY_ON LOW
+#define RELAY_OFF HIGH
+
+// =====================================================
+// TEMPERATURE LIMITS
+// =====================================================
+
+// ROOM TEST VALUES
+float MIN_TEMP = 25.0;
+float MAX_TEMP = 35.0;
+
+// REAL COLD STORAGE VALUES
+// float MIN_TEMP = 2.0;
+// float MAX_TEMP = 8.0;
+
+// =====================================================
+// AI VARIABLES
+// =====================================================
+
+float prevTemp = 0;
+float riseThreshold = 1.0;
+
+// =====================================================
+// INTEGRITY SEAL
+// =====================================================
+
+bool systemFailed = false;
+
+// =====================================================
+// SETUP
+// =====================================================
+
+void setup() {
+
+  Serial.begin(115200);
+
+  // OUTPUTS
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  pinMode(RELAY_PIN, OUTPUT);
+
+  // =================================================
+  // SAFE STARTUP STATE
+  // =================================================
+
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(BUZZER, LOW);
+
+  // RELAY OFF
+  digitalWrite(RELAY_PIN, RELAY_OFF);
+
+  // =================================================
+  // START SENSORS
+  // =================================================
+
+  dht.begin();
+  sensors.begin();
+
+  // =================================================
+  // WIFI CONNECTION
+  // =================================================
+
+  WiFi.begin(ssid, password);
+
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("\n✅ WiFi Connected");
+}
+
+// =====================================================
+// MAIN LOOP
+// =====================================================
+
+void loop() {
+
+  Serial.println("\n================================");
+  Serial.println("NEW SENSOR READING");
+  Serial.println("================================");
+
+  // =================================================
+  // READ DS18B20
+  // =================================================
+
+  sensors.requestTemperatures();
+  float temp = sensors.getTempCByIndex(0);
+
+  // =================================================
+  // READ DHT11
+  // =================================================
+
+  float humidity = dht.readHumidity();
+
+  // =================================================
+  // SENSOR ERROR CHECK
+  // =================================================
+
+  if (temp == -127.0 || isnan(humidity)) {
+
+    Serial.println("❌ SENSOR ERROR!");
+
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(BUZZER, LOW);
+
+    // FORCE RELAY OFF
+    digitalWrite(RELAY_PIN, RELAY_OFF);
+
+    delay(3000);
+    return;
+  }
+
+  // =================================================
+  // DISPLAY VALUES
+  // =================================================
+
+  Serial.print("🌡 Temperature: ");
+  Serial.print(temp);
+  Serial.println(" °C");
+
+  Serial.print("💧 Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
+
+  // =================================================
+  // AI LOGIC
+  // =================================================
+
+  float tempChange = temp - prevTemp;
+
+  Serial.print("📈 Temperature Change: ");
+  Serial.println(tempChange);
+
+  if (prevTemp != 0 && tempChange > riseThreshold) {
+
+    Serial.println("⚠️ AI WARNING: Temperature Rising Fast!");
+  }
+
+  prevTemp = temp;
+
+  // =================================================
+  // INTEGRITY MEMORY
+  // =================================================
+
+  if (temp > MAX_TEMP || temp < MIN_TEMP) {
+
+    systemFailed = true;
+  }
+
+  // =================================================
+  // ALERT CONDITION
+  // =================================================
+
+  bool alertNow = (temp > MAX_TEMP || temp < MIN_TEMP);
+
+  // =================================================
+  // ALERT MODE
+  // =================================================
+
+  if (alertNow) {
+
+    Serial.println("🚨 ALERT CONDITION!");
+
+    // LEDs + buzzer
+    digitalWrite(RED_LED, HIGH);
+    digitalWrite(GREEN_LED, LOW);
+    digitalWrite(BUZZER, HIGH);
+
+    // =================================================
+    // RELAY ON
+    // =================================================
+
+    digitalWrite(RELAY_PIN, RELAY_ON);
+
+    Serial.println("❄️ PELTIER ON");
+    Serial.println("🌀 FAN ON");
+  }
+
+  // =================================================
+  // SAFE MODE
+  // =================================================
+
+  else {
+
+    Serial.println("✅ SAFE TEMPERATURE");
+
+    // LEDs + buzzer
+    digitalWrite(GREEN_LED, HIGH);
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(BUZZER, LOW);
+
+    // =================================================
+    // RELAY OFF
+    // =================================================
+
+    digitalWrite(RELAY_PIN, RELAY_OFF);
+
+    Serial.println("❄️ PELTIER OFF");
+    Serial.println("🌀 FAN OFF");
+  }
+
+  // =================================================
+  // INTEGRITY STATUS
+  // =================================================
+
+  if (systemFailed) {
+
+    Serial.println("❌ INTEGRITY STATUS = FAILED");
+  }
+
+  else {
+
+    Serial.println("✅ INTEGRITY STATUS = SAFE");
+  }
+
+  // =================================================
+  // CLOUD UPDATE
+  // =================================================
+
+  if (WiFi.status() == WL_CONNECTED) {
+
+    HTTPClient http;
+
+    String url = server;
+
+    url += "?api_key=" + apiKey;
+    url += "&field1=" + String(temp);
+    url += "&field2=" + String(humidity);
+
+    http.begin(url);
+
+    int httpCode = http.GET();
+
+    Serial.print("🌐 ThingSpeak HTTP Code: ");
+    Serial.println(httpCode);
+
+    http.end();
+  }
+
+  Serial.println("--------------------------------");
+
+  delay(15000);
+}
